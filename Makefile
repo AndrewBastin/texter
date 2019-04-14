@@ -21,5 +21,11 @@ $(TARGET_DEB): $(OBJS)
 
 clean:
 	rm -rf $(TARGET) *.o
+
+install: all
+	sudo cp $(TARGET) /usr/bin/texter
+
+uninstall:
+	sudo rm -r /usr/bin/texter
 	
 .PHONY: all clean
