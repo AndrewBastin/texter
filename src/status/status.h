@@ -1,0 +1,1 @@
+void status_run(struct Editor *editor);
