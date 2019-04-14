@@ -65,7 +65,7 @@ void editor_run(struct Editor *editor) {
     
     // Draw text from the beginning
     int ln = 0;
-    for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
+    for (struct EditorLine *line = editor->firstLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next) {
         curses_drawText(ln++, 0, line->str);
     }
 
