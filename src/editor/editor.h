@@ -8,8 +8,10 @@ struct Editor {
     int cursX;
     int cursY;
 
+    int scrollY;
 
     struct EditorLine *firstLine; // The first line (the line with the prev NULL) (used to make deletes and stuff easier)
+    struct EditorLine *scrollLine; // The line on top on the current scroll config
     int lineCount;
 };
 

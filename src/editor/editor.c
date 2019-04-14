@@ -54,7 +54,9 @@ struct Editor *editor_createBlankEditor() {
     editor->line = editor_createLine("", NULL, NULL);   // Create the first line
     editor->cursX = 0;
     editor->cursY = 0;
+    editor->scrollY = 0;
     editor->firstLine = editor->line;
+    editor->scrollLine = editor->firstLine;
     editor->lineCount = 1;
 
     return editor;
@@ -65,13 +67,13 @@ void editor_run(struct Editor *editor) {
     
     // Draw text from the beginning
     int ln = 0;
-    for (struct EditorLine *line = editor->firstLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next) {
+    for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next) {
         curses_drawText(ln++, 0, line->str);
     }
 
 
     // Set cursor position
-    curses_setCursorPos(editor->cursY, editor->cursX);
+    curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX);
 
     int ch = curses_getch();
 
@@ -99,6 +101,10 @@ void editor_run(struct Editor *editor) {
 
                 editor_freeLine(l);                                                                     // Delete the line
                 
+                if (editor->cursY == editor->scrollY && editor->scrollLine->prev != NULL) {
+                    editor->scrollY--;
+                    editor->scrollLine = editor->scrollLine->prev;
+                }
                 editor->cursY--;                                                                        // Move the cursor up a line
                 editor->cursX = oldPrevLen;                                                             // Set the horizontal cursor pos correctly
                 
@@ -132,6 +138,12 @@ void editor_run(struct Editor *editor) {
                 }
 
                 editor->line = editor->line->prev;
+                
+                if (editor->cursY == editor->scrollY && editor->scrollLine->prev != NULL) {
+                    editor->scrollY--;
+                    editor->scrollLine = editor->scrollLine->prev;
+                }
+
                 editor->cursY--;
             }
 
@@ -146,8 +158,12 @@ void editor_run(struct Editor *editor) {
                 }
 
                 editor->line = editor->line->next;
+                
+                if (editor->cursY == editor->scrollY + curses_getScreenHeight() - 2) {
+                    editor->scrollY++;
+                    editor->scrollLine = editor->scrollLine->next;
+                }
                 editor->cursY++;
-
             }
 
             break;
@@ -167,6 +183,11 @@ void editor_run(struct Editor *editor) {
             editor->line->next = newLine;
             
             editor->line = editor->line->next;
+
+            if (editor->cursY == editor->scrollY + curses_getScreenHeight() - 2) {
+                editor->scrollY++;
+                editor->scrollLine = editor->scrollLine->next;
+            }
             editor->cursY++;
             editor->cursX = 0;
 
