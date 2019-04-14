@@ -20,13 +20,29 @@ void signalHandler(int sig) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
 
 	signal(SIGINT, signalHandler);						// Set Signal Handler
 
-	curses_init();
+	if (argc > 2) {
+		printf("ERROR : Too many arguments supplied \n\n");
+		printf("Usage : \n");
+		printf("texter (file to load (optional))\n");
 
-	editor = editor_createBlankEditor();
+		return -1;
+	} else if (argc == 1) {
+		editor = editor_createBlankEditor();
+	} else if (argc == 2) {
+		editor = editor_createEditorFromFile(argv[1]);
+
+		if (editor == NULL) {
+			printf("ERROR : Failed loading the file...\n");
+
+			return -2;
+		}
+	}
+
+	curses_init();
 
 	while (1) {
 

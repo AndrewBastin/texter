@@ -7,6 +7,44 @@
 #include "line.h"
 #include "editor.h"
 
+
+/* Creates an editor instance for a given filename and load its contents, returns null if errors occur*/
+struct Editor *editor_createEditorFromFile(char *filename) {
+
+    struct Editor *editor = editor_createBlankEditor();
+    editor->filename = filename;
+    
+    // Load file
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) { // Error Handling
+        editor_freeEditor(editor);
+        return NULL;
+    }
+
+    // Read file character by character
+    char c;
+    while ((c = (char) getc(file)) != EOF) { // Read until EOF
+        if (c == '\n') { // Go to next line on new line
+            struct EditorLine *newLine = editor_createLine("", NULL, editor->line);
+            
+            editor->line->next = newLine;
+            editor->line = newLine;
+            editor->lineCount++;
+        } else {
+            char *cStr = charAsString(c);
+            editor_appendToLine(editor->line, cStr, editor->line->len);
+
+            free(cStr);
+        }
+    }
+
+    fclose(file); // Close file
+
+    editor->line = editor->firstLine; // Jump back to first line
+
+    return editor;
+}
+
 /* Creates a new instance of an editor*/
 struct Editor *editor_createBlankEditor() {
 
@@ -25,6 +63,13 @@ struct Editor *editor_createBlankEditor() {
 /* Runs the given editor instance */
 void editor_run(struct Editor *editor) {
     
+    // Draw text from the beginning
+    int ln = 0;
+    for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
+        curses_drawText(ln++, 0, line->str);
+    }
+
+
     // Set cursor position
     curses_setCursorPos(editor->cursY, editor->cursX);
 
@@ -144,12 +189,6 @@ void editor_run(struct Editor *editor) {
     }
 
     curses_clear();
-
-    // Draw text from the beginning
-    int ln = 0;
-    for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
-        curses_drawText(ln++, 0, line->str);
-    }
 }
 
 /* Deallocates the given editor instance */

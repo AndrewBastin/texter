@@ -13,6 +13,7 @@ struct Editor {
     int lineCount;
 };
 
+struct Editor *editor_createEditorFromFile(char *filename);
 struct Editor *editor_createBlankEditor();
 void editor_run(struct Editor *editor);
 void editor_freeEditor(struct Editor *editor);
