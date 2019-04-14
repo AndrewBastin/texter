@@ -177,6 +177,30 @@ void editor_run(struct Editor *editor) {
             
             break;
         }
+
+        case CURSES_CHAR_CTRL('s'):
+            
+            if (editor->filename != NULL) {
+                
+                FILE *file = fopen(editor->filename, "w+");
+                if (file != NULL) {
+                    
+                    short first = 1;
+                    for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
+                        
+                        // To put new line before all lines other than the first line
+                        if (first) first = 0;
+                        else fputc('\n', file);
+                        
+                        fputs(line->str, file);
+                    }
+
+                    fclose(file);
+                }
+
+            }
+
+            break;
             
         default: {
             char *chrStr = charAsString(ch);
