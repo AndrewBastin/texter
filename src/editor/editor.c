@@ -54,6 +54,7 @@ struct Editor *editor_createBlankEditor() {
     editor->line = editor_createLine("", NULL, NULL);   // Create the first line
     editor->cursX = 0;
     editor->cursY = 0;
+    editor->scrollX = 0;
     editor->scrollY = 0;
     editor->firstLine = editor->line;
     editor->scrollLine = editor->firstLine;
@@ -67,13 +68,15 @@ void editor_run(struct Editor *editor) {
     
     // Draw text from the beginning
     int ln = 0;
-    for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next) {
-        curses_drawText(ln++, 0, line->str, line->len);
+    for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next, ln++) {
+        if (editor->scrollX < line->len) {
+            curses_drawText(ln, 0, line->str + editor->scrollX, line->len - editor->scrollX + 1);
+        }
     }
 
 
     // Set cursor position
-    curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX);
+    curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
 
     int ch = curses_getch();
 
@@ -108,14 +111,20 @@ void editor_run(struct Editor *editor) {
                 editor->cursY--;                                                                        // Move the cursor up a line
                 editor->cursX = oldPrevLen;                                                             // Set the horizontal cursor pos correctly
                 
+                // TODO : Update scroll
+                if (editor->cursX - editor->scrollX > curses_getScreenWidth()) editor->scrollX = editor->cursX - curses_getScreenWidth() + 2;
+
                 editor->lineCount--;
             }
 
             break;
 
         case CURSES_KEY_LEFT:
-                
+
             if (editor->cursX > 0) {
+                
+                if (editor->cursX == editor->scrollX) editor->scrollX--;
+                
                 editor->cursX--;
             }
                 
@@ -124,6 +133,9 @@ void editor_run(struct Editor *editor) {
         case CURSES_KEY_RIGHT:
 
             if (editor->cursX < editor->line->len) {
+                
+                if (editor->cursX - editor->scrollX + 1 == curses_getScreenWidth()) editor->scrollX++;
+                
                 editor->cursX++;
             }
 
@@ -190,6 +202,7 @@ void editor_run(struct Editor *editor) {
             }
             editor->cursY++;
             editor->cursX = 0;
+            editor->scrollX = 0;
 
             editor->lineCount++;
             
@@ -226,6 +239,10 @@ void editor_run(struct Editor *editor) {
         default: {
             char *chrStr = charAsString(ch);
             editor_appendToLine(editor->line, chrStr, editor->cursX);
+
+            // Scroll on typing into scroll end
+            if (editor->line->len - editor->scrollX >= curses_getScreenWidth()) editor->scrollX++;
+            
             editor->cursX++;
             
             free(chrStr);
