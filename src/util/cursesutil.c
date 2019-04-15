@@ -16,14 +16,26 @@ void curses_deinit() {
 	endwin(); 					// Stops Ncurses mode
 }
 
+/* Gets the screen width */
+int curses_getScreenWidth() {
+	return getmaxx(stdscr);
+}
+
+/* Gets the screen height */
+int curses_getScreenHeight() {
+	return getmaxy(stdscr);
+}
+
 /* Gets a character */
 char curses_getch() {
 	return getch();
 }
 
 /* Draws a string at a given position */
-void curses_drawText(int y, int x, char *str) {
-	mvaddstr(y, x, str);
+void curses_drawText(int y, int x, char *str, int len) {
+	if ((len >= x && len - x > curses_getScreenWidth()) || (len <= x && x - len > curses_getScreenWidth())) {
+		mvaddnstr(y, x, str, curses_getScreenWidth() - 1);
+	} else mvaddnstr(y, x, str, len);
 }
 
 void curses_drawChar(int y, int x, char ch) {
@@ -53,16 +65,6 @@ void curses_activateColorPair(short id) {
 /* Deactivates a color pair for rendering in ncurses */
 void curses_deactivateColorPair(short id) {
 	attroff(COLOR_PAIR(id));
-}
-
-/* Gets the screen width */
-int curses_getScreenWidth() {
-	return getmaxx(stdscr);
-}
-
-/* Gets the screen height */
-int curses_getScreenHeight() {
-	return getmaxy(stdscr);
 }
 
 /* Draws a horizontal strip at the given line */

@@ -23,7 +23,7 @@
 void curses_init();
 void curses_deinit();
 int curses_getch();
-void curses_drawText(int y, int x, char *str);
+void curses_drawText(int y, int x, char *str, int n);
 void curses_drawChar(int y, int x, char ch);
 void curses_clear();
 void curses_setCursorPos(int y, int x);
