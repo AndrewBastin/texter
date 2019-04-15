@@ -9,7 +9,7 @@ void status_run(struct Editor *editor) {
     curses_printf(
         curses_getScreenHeight() - 1, 
         0, 
-        "%s\t\t[%d lines]\t %d, %d", 
+        "%s [%d lines]\t %d, %d", 
         (editor->filename == NULL) ? "<New File>" : editor->filename, 
         editor->lineCount, 
         editor->cursY + 1, 
