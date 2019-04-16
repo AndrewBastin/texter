@@ -111,7 +111,7 @@ void editor_run(struct Editor *editor) {
                 editor->cursY--;                                                                        // Move the cursor up a line
                 editor->cursX = oldPrevLen;                                                             // Set the horizontal cursor pos correctly
                 
-                // TODO : Update scroll
+                // Update scroll
                 if (editor->cursX - editor->scrollX > curses_getScreenWidth()) editor->scrollX = editor->cursX - curses_getScreenWidth() + 2;
 
                 editor->lineCount--;
