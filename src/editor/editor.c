@@ -63,10 +63,7 @@ struct Editor *editor_createBlankEditor() {
     return editor;
 }
 
-/* Runs the given editor instance */
-void editor_run(struct Editor *editor) {
-    
-    // Draw text from the beginning
+void editor_render(struct Editor *editor) {
     int ln = 0;
     for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next, ln++) {
         if (editor->scrollX < line->len) {
@@ -74,9 +71,13 @@ void editor_run(struct Editor *editor) {
         }
     }
 
-
-    // Set cursor position
     curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
+}
+
+/* Runs the given editor instance */
+void editor_run(struct Editor *editor) {
+
+    editor_render(editor);
 
     int ch = curses_getch();
 
