@@ -52,6 +52,7 @@ struct Editor *editor_createBlankEditor() {
 
     editor->filename = NULL;
     editor->line = editor_createLine("", NULL, NULL);   // Create the first line
+    editor->isModified = 0;
     editor->cursX = 0;
     editor->cursY = 0;
     editor->scrollX = 0;
@@ -105,6 +106,7 @@ void editor_run(struct Editor *editor) {
             if (editor->cursX > 0) {                                                                    // There is text on the left to delete
                 editor_deleteFromLine(editor->line, editor->cursX - 1, editor->cursX - 1);
                 editor->cursX--;
+                editor->isModified = 1;
             } else if (editor->cursX == 0 && editor->line->prev != NULL) {                              // There is no text on the left to delete, move line contents to the line above and destroy this line
                 
                 int oldPrevLen = editor->line->prev->len;                                               // Stored to move the cursor to correct place later
@@ -130,6 +132,8 @@ void editor_run(struct Editor *editor) {
                 if (editor->cursX - editor->scrollX > curses_getScreenWidth()) editor->scrollX = editor->cursX - curses_getScreenWidth() + 2;
 
                 editor->lineCount--;
+
+                editor->isModified = 1;
             }
 
             break;
@@ -210,6 +214,8 @@ void editor_run(struct Editor *editor) {
             
             free(newLineContent);
             free(currLineContent);
+
+            editor->isModified = 1;
             
             break;
         }
@@ -232,6 +238,8 @@ void editor_run(struct Editor *editor) {
                     }
 
                     fclose(file);
+
+                    editor->isModified = 0;
                 }
 
             }
@@ -248,6 +256,8 @@ void editor_run(struct Editor *editor) {
             editor->cursX++;
             
             free(chrStr);
+
+            editor->isModified = 1;
             break;
         }
     }

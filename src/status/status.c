@@ -14,7 +14,7 @@ void status_run(struct Editor *editor) {
     curses_printf(
         curses_getScreenHeight() - 1, 
         0, 
-        " %s [%d lines]", 
+        (editor->isModified) ? " %s [%d lines] [+]" : " %s [%d lines]", 
         (editor->filename == NULL) ? "<New File>" : editor->filename, 
         editor->lineCount
     );
