@@ -74,6 +74,24 @@ void editor_render(struct Editor *editor) {
     curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
 }
 
+/* Use this function in place of just editor->cursY-- to handle horizontal scroll updates */
+void editor_moveCursorUp(struct Editor *editor) {
+    if (editor->cursY == editor->scrollY && editor->scrollLine->prev != NULL) {
+        editor->scrollY--;
+        editor->scrollLine = editor->scrollLine->prev;
+    }
+    editor->cursY--;
+}
+
+/* Use this function in place of just editor->cursY++ to handle horizontal scroll updates */
+void editor_moveCursorDown(struct Editor *editor) {
+    if (editor->cursY == editor->scrollY + curses_getScreenHeight() - 2) {
+        editor->scrollY++;
+        editor->scrollLine = editor->scrollLine->next;
+    }
+    editor->cursY++;
+}
+
 /* Runs the given editor instance */
 void editor_run(struct Editor *editor) {
 
@@ -105,11 +123,7 @@ void editor_run(struct Editor *editor) {
 
                 editor_freeLine(l);                                                                     // Delete the line
                 
-                if (editor->cursY == editor->scrollY && editor->scrollLine->prev != NULL) {
-                    editor->scrollY--;
-                    editor->scrollLine = editor->scrollLine->prev;
-                }
-                editor->cursY--;                                                                        // Move the cursor up a line
+                editor_moveCursorUp(editor);
                 editor->cursX = oldPrevLen;                                                             // Set the horizontal cursor pos correctly
                 
                 // Update scroll
@@ -152,12 +166,7 @@ void editor_run(struct Editor *editor) {
 
                 editor->line = editor->line->prev;
                 
-                if (editor->cursY == editor->scrollY && editor->scrollLine->prev != NULL) {
-                    editor->scrollY--;
-                    editor->scrollLine = editor->scrollLine->prev;
-                }
-
-                editor->cursY--;
+                editor_moveCursorUp(editor);
             }
 
             break;
@@ -172,11 +181,7 @@ void editor_run(struct Editor *editor) {
 
                 editor->line = editor->line->next;
                 
-                if (editor->cursY == editor->scrollY + curses_getScreenHeight() - 2) {
-                    editor->scrollY++;
-                    editor->scrollLine = editor->scrollLine->next;
-                }
-                editor->cursY++;
+                editor_moveCursorDown(editor);
             }
 
             break;
@@ -197,11 +202,7 @@ void editor_run(struct Editor *editor) {
             
             editor->line = editor->line->next;
 
-            if (editor->cursY == editor->scrollY + curses_getScreenHeight() - 2) {
-                editor->scrollY++;
-                editor->scrollLine = editor->scrollLine->next;
-            }
-            editor->cursY++;
+            editor_moveCursorDown(editor);
             editor->cursX = 0;
             editor->scrollX = 0;
 
