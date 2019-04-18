@@ -1,11 +1,16 @@
 #include <stdlib.h>
 
 struct EditorLine {
-    
+
+    /* The string representing the contents of the given line*/    
     char *str;
+
+    /* Length of the given line (updated by editor_updateLine) */
     size_t len;
 
+    /* The line after the given line (usually the line below) */
     struct EditorLine *next;
+    /* The line before the given line (usually the line above) */
     struct EditorLine *prev;
 };
 
