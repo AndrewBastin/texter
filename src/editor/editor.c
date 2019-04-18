@@ -4,6 +4,7 @@
 
 #include "../util/cursesutil.h"
 #include "../util/stringutil.h"
+#include "../prompt/prompt.h"
 #include "line.h"
 #include "editor.h"
 
@@ -220,31 +221,34 @@ void editor_run(struct Editor *editor) {
             break;
         }
 
-        case CURSES_CHAR_CTRL('s'):
+        case CURSES_CHAR_CTRL('s'): {
             
+            FILE *file;
             if (editor->filename != NULL) {
-                
-                FILE *file = fopen(editor->filename, "w+");
-                if (file != NULL) {
-                    
-                    short first = 1;
-                    for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
-                        
-                        // To put new line before all lines other than the first line
-                        if (first) first = 0;
-                        else fputc('\n', file);
-                        
-                        fputs(line->str, file);
-                    }
-
-                    fclose(file);
-
-                    editor->isModified = 0;
-                }
-
+                file = fopen(editor->filename, "w+");
+            } else {
+                prompt_run(PROMPT_SAVENAME, editor);           // Prompt for a filename and set the editor to target that
+                file = fopen(editor->filename, "w+");
             }
 
+            if (file != NULL) {
+                    
+                short first = 1;
+                for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
+                    
+                    // To put new line before all lines other than the first line
+                    if (first) first = 0;
+                    else fputc('\n', file);
+                    
+                    fputs(line->str, file);
+                }
+
+                fclose(file);
+
+                editor->isModified = 0;
+            }
             break;
+        }
             
         default: {
             char *chrStr = charAsString(ch);
