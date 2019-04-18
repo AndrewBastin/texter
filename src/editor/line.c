@@ -19,7 +19,7 @@ struct EditorLine *editor_createLine(char *contents, struct EditorLine *next, st
 }
 
 /* Updates the line content for a given instance */
-struct EditorLine *editor_updateLine(struct EditorLine *line, char *newContents) {
+void editor_updateLine(struct EditorLine *line, char *newContents) {
 
     free(line->str);                                                                // Deallocate existing line string
     
@@ -30,7 +30,7 @@ struct EditorLine *editor_updateLine(struct EditorLine *line, char *newContents)
 }
 
 /* Appends string to the line at appendIndex */
-struct EditorLine *editor_appendToLine(struct EditorLine *line, char *toConcat, int appendIndex) {
+void editor_appendToLine(struct EditorLine *line, char *toConcat, int appendIndex) {
 
     char *oldStr = line->str;
 
@@ -52,7 +52,7 @@ struct EditorLine *editor_appendToLine(struct EditorLine *line, char *toConcat, 
 }
 
 /* Delete certain character range from line (start and end range are inclusive) */
-struct EditorLine *editor_deleteFromLine(struct EditorLine *line, int startIndex, int endIndex) {
+void editor_deleteFromLine(struct EditorLine *line, int startIndex, int endIndex) {
 
     char *oldStr = line->str;
 
@@ -72,7 +72,7 @@ struct EditorLine *editor_deleteFromLine(struct EditorLine *line, int startIndex
 }
 
 /* Deallocates the editor line instance */
-struct EditorLine *editor_freeLine(struct EditorLine *line) {
+void editor_freeLine(struct EditorLine *line) {
     free(line->str);
     free(line);
 }
