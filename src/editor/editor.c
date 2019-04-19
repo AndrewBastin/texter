@@ -162,7 +162,14 @@ void editor_run(struct Editor *editor) {
                 if (editor->cursX == editor->scrollX) editor->scrollX--;
                 
                 editor->cursX--;
-            }
+            } else if (editor->cursX == 0 && editor->cursY > 0) {
+                editor_moveCursorUp(editor);
+
+                editor->line = editor->line->prev;	
+                editor->cursX = editor->line->len;
+                
+                if (editor->cursX - editor->scrollX > curses_getScreenWidth()) editor->scrollX = editor->cursX - curses_getScreenWidth() + 2;
+	        }
                 
             break;
 
@@ -173,6 +180,13 @@ void editor_run(struct Editor *editor) {
                 if (editor->cursX - editor->scrollX + 1 == curses_getScreenWidth()) editor->scrollX++;
                 
                 editor->cursX++;
+            } else if (editor->cursX == editor->line->len && editor->line->next != NULL) {
+
+                editor_moveCursorDown(editor);
+                editor->line = editor->line->next;
+                editor->cursX = 0;
+                editor->scrollX = 0;
+
             }
 
             break;
