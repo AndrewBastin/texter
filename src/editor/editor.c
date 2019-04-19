@@ -69,8 +69,24 @@ void editor_render(struct Editor *editor) {
     int ln = 0;
     for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next, ln++) {
         if (editor->scrollX < line->len) {
-            curses_drawText(ln, 0, line->str + editor->scrollX, line->len - editor->scrollX + 1);
-        }
+        	int pos = 0;
+		for (char *x = line->str + editor->scrollX; *x != '\0'; x++) {
+			
+			switch (*x) {
+				
+				// for now, let tabs be rendered as single characters to make cursor positioning easier
+				case '\t':
+					curses_drawChar(ln, pos++, ' ');
+					break;
+
+				default:
+					curses_drawChar(ln, pos++, *x);
+					break;
+
+			}
+
+		}
+	}
     }
 
     curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
