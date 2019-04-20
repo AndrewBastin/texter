@@ -27,7 +27,7 @@ int curses_getScreenHeight() {
 }
 
 /* Gets a character */
-char curses_getch() {
+int curses_getch() {
 	return getch();
 }
 
