@@ -251,6 +251,13 @@ void editor_run(struct Editor *editor) {
             break;
         }
 
+        case '\t':
+            editor_appendToLine(editor->line, "    ", editor->cursX);
+            editor->cursX += 4;
+
+            if (editor->cursX - editor->scrollX >= curses_getScreenWidth()) editor->scrollX += 4;
+            break;
+
         case CURSES_CHAR_CTRL('s'): {
             
             FILE *file;
