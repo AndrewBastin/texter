@@ -123,6 +123,9 @@ void editor_run(struct Editor *editor) {
     int ch = curses_getch();
 
     switch (ch) {
+        case CURSES_CH_ERR:
+            break;
+
         case CURSES_KEY_BACKSPACE:
             
             if (editor->cursX > 0) {                                                                    // There is text on the left to delete

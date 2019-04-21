@@ -8,6 +8,7 @@ void curses_init() {
 	noecho();	 				// Disable echoing
 	cbreak();					// Disable line buffering
 	keypad(stdscr, true);		// Enable Special Characters
+    nodelay(stdscr, true);      // Sets no delay
 	start_color();				// Enable Color
 }
 
