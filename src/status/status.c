@@ -14,9 +14,11 @@ void status_run(struct Editor *editor) {
     curses_printf(
         curses_getScreenHeight() - 1, 
         0, 
-        (editor->isModified) ? " %s [%d lines] [+]" : " %s [%d lines]", 
-        (editor->filename == NULL) ? "<New File>" : editor->filename, 
-        editor->lineCount
+        " %s %s [%d lines] %s", 
+        (editor->filename == NULL) ? "" : editor->filename,
+        (editor->doesFileExist) ? "" : "<New File>",
+        editor->lineCount,
+        (editor->isModified) ? "[+]" : ""
     );
 
     // Rendering position string on the right edge
