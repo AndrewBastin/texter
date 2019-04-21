@@ -24,6 +24,9 @@ struct Editor {
     /* The amount of characters scrolled (to the bottom) */
     int scrollY;
 
+    /* Specifies whether a rerender should be done */
+    short shouldRender;
+
     /* The first line (the line with the prev NULL) (used to make deletes and stuff easier) */
     struct EditorLine *firstLine; 
     /* The line on the top on the current scroll config */

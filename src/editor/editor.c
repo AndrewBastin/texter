@@ -63,6 +63,7 @@ struct Editor *editor_createBlankEditor() {
     editor->cursY = 0;
     editor->scrollX = 0;
     editor->scrollY = 0;
+    editor->shouldRender = 1;
     editor->firstLine = editor->line;
     editor->scrollLine = editor->firstLine;
     editor->lineCount = 1;
@@ -75,26 +76,24 @@ void editor_render(struct Editor *editor) {
     for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next, ln++) {
         if (editor->scrollX < line->len) {
         	int pos = 0;
-		for (char *x = line->str + editor->scrollX; *x != '\0'; x++) {
-			
-			switch (*x) {
-				
-				// for now, let tabs be rendered as single characters to make cursor positioning easier
-				case '\t':
-					curses_drawChar(ln, pos++, ' ');
-					break;
+            for (char *x = line->str + editor->scrollX; *x != '\0'; x++) {
+                
+                switch (*x) {
+                    
+                    // for now, let tabs be rendered as single characters to make cursor positioning easier
+                    case '\t':
+                        curses_drawChar(ln, pos++, ' ');
+                        break;
 
-				default:
-					curses_drawChar(ln, pos++, *x);
-					break;
+                    default:
+                        curses_drawChar(ln, pos++, *x);
+                        break;
 
-			}
+                }
 
-		}
-	}
+            }
+	    }
     }
-
-    curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
 }
 
 /* Use this function in place of just editor->cursY-- to handle horizontal scroll updates */
@@ -118,9 +117,14 @@ void editor_moveCursorDown(struct Editor *editor) {
 /* Runs the given editor instance */
 void editor_run(struct Editor *editor) {
 
-    editor_render(editor);
+    if (editor->shouldRender) editor_render(editor);
+    editor->shouldRender = 0;
 
+    curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
+    
     int ch = curses_getch();
+    
+    if (ch != CURSES_CH_ERR) editor->shouldRender = 1;
 
     switch (ch) {
         case CURSES_CH_ERR:
@@ -311,7 +315,7 @@ void editor_run(struct Editor *editor) {
         }
     }
 
-    curses_clear();
+    if (editor->shouldRender) curses_clear();
 }
 
 /* Deallocates the given editor instance */
