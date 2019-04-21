@@ -52,7 +52,5 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	while (curses_getch());
-	
 	return 0;
 }
