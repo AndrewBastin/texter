@@ -4,6 +4,7 @@
 
 #include "../util/cursesutil.h"
 #include "../util/stringutil.h"
+#include "../util/fileutil.h"
 #include "../prompt/prompt.h"
 #include "line.h"
 #include "editor.h"
@@ -14,34 +15,38 @@ struct Editor *editor_createEditorFromFile(char *filename) {
 
     struct Editor *editor = editor_createBlankEditor();
     editor->filename = filename;
+    editor->doesFileExist = file_exists(filename);
     
-    // Load file
-    FILE *file = fopen(filename, "r");
-    if (file == NULL) { // Error Handling
-        editor_freeEditor(editor);
-        return NULL;
-    }
-
-    // Read file character by character
-    char c;
-    while ((c = (char) getc(file)) != EOF) { // Read until EOF
-        if (c == '\n') { // Go to next line on new line
-            struct EditorLine *newLine = editor_createLine("", NULL, editor->line);
+    if (editor->doesFileExist) {
             
-            editor->line->next = newLine;
-            editor->line = newLine;
-            editor->lineCount++;
-        } else {
-            char *cStr = charAsString(c);
-            editor_appendToLine(editor->line, cStr, editor->line->len);
-
-            free(cStr);
+        // Load file
+        FILE *file = fopen(filename, "r");
+        if (file == NULL) { // Error Handling
+            editor_freeEditor(editor);
+            return NULL;
         }
+
+        // Read file character by character
+        char c;
+        while ((c = (char) getc(file)) != EOF) { // Read until EOF
+            if (c == '\n') { // Go to next line on new line
+                struct EditorLine *newLine = editor_createLine("", NULL, editor->line);
+                
+                editor->line->next = newLine;
+                editor->line = newLine;
+                editor->lineCount++;
+            } else {
+                char *cStr = charAsString(c);
+                editor_appendToLine(editor->line, cStr, editor->line->len);
+
+                free(cStr);
+            }
+        }
+
+        fclose(file); // Close file
+
+        editor->line = editor->firstLine; // Jump back to first line
     }
-
-    fclose(file); // Close file
-
-    editor->line = editor->firstLine; // Jump back to first line
 
     return editor;
 }

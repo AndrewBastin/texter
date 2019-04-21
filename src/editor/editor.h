@@ -6,6 +6,8 @@ struct Editor {
     
     /* Null if editor instance is not associated with a file, else the string of the file path */
     char *filename;
+    /* 1 if the file exists in disk else not */
+    short doesFileExist;
     /* 1 if the file is modified 0 if the file is not modified */
     short isModified;
     
