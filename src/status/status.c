@@ -3,6 +3,8 @@
 #include "../util/cursesutil.h"
 
 void status_run(struct Editor *editor) {
+    
+    if (!editor->shouldRender) return;
 
     curses_activateAttr(CURSES_ATTR_REVERSE);
 
