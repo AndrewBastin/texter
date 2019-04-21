@@ -1,3 +1,7 @@
+#ifndef EDITOR_H
+
+#define EDITOR_H
+
 struct Editor {
     
     /* Null if editor instance is not associated with a file, else the string of the file path */
@@ -31,3 +35,5 @@ struct Editor *editor_createEditorFromFile(char *filename);
 struct Editor *editor_createBlankEditor();
 void editor_run(struct Editor *editor);
 void editor_freeEditor(struct Editor *editor);
+
+#endif
