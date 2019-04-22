@@ -32,6 +32,8 @@ void prompt_save(struct Editor *editor) {
         curses_drawText(curses_getScreenHeight() - 1, 19, line->str + scrollX, line->len - scrollX + 1);
 
         ch = curses_getch();
+        
+        if (ch == CURSES_CH_ERR) continue;
 
         switch (ch) {
             
