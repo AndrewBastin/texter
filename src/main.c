@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <signal.h>
 
-#include "util/cursesutil.h"
+#include "renderer/renderer.h"
 #include "editor/editor.h"
 #include "status/status.h"
 
@@ -12,7 +12,7 @@ struct Editor *editor = NULL;
 
 void signalHandler(int sig) {
 	if (sig == SIGINT) {
-		curses_deinit();
+		renderer_deinit();
 
 		if (editor != NULL) editor_freeEditor(editor);
 		exit(0);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	curses_init();
+	renderer_init();
 
 	while (1) {
 

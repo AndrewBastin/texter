@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "../util/cursesutil.h"
+#include "../renderer/renderer.h"
 #include "../util/stringutil.h"
 #include "../editor/editor.h"
 #include "../editor/line.h"
@@ -10,8 +10,8 @@
 /* Blanks the prompt bar */
 void prompt_blank() {
     // Printing spaces to fill the full bottom row
-    for (int i = 0; i < curses_getScreenWidth(); i++) {
-        curses_drawChar(curses_getScreenHeight() - 1, i, ' ');
+    for (int i = 0; i < renderer_getScreenWidth(); i++) {
+        renderer_drawChar(renderer_getScreenHeight() - 1, i, ' ');
     }
 }
 
@@ -28,10 +28,10 @@ void prompt_save(struct Editor *editor) {
 
         // Draw string
         prompt_blank();
-        curses_drawText(curses_getScreenHeight() - 1, 0, " Enter file name : ", 20);
-        curses_drawText(curses_getScreenHeight() - 1, 19, line->str + scrollX, line->len - scrollX + 1);
+        renderer_drawText(renderer_getScreenHeight() - 1, 0, " Enter file name : ", 20);
+        renderer_drawText(renderer_getScreenHeight() - 1, 19, line->str + scrollX, line->len - scrollX + 1);
 
-        ch = curses_getch();
+        ch = renderer_getch();
         
         if (ch == CURSES_CH_ERR) continue;
 
@@ -46,7 +46,7 @@ void prompt_save(struct Editor *editor) {
 
             case CURSES_KEY_RIGHT:
                 if (cursX < line->len) {
-                    if (cursX - scrollX == curses_getScreenWidth() - 20) scrollX++;
+                    if (cursX - scrollX == renderer_getScreenWidth() - 20) scrollX++;
                     cursX++;
                 }
                 break;
@@ -80,7 +80,7 @@ void prompt_save(struct Editor *editor) {
 }
 
 void prompt_run(int promptType, struct Editor *editor) {
-    curses_activateAttr(CURSES_ATTR_REVERSE);
+    renderer_activateAttr(CURSES_ATTR_REVERSE);
     
     prompt_blank();
 
@@ -90,5 +90,5 @@ void prompt_run(int promptType, struct Editor *editor) {
             break;
     }
     
-    curses_deactivateAttr(CURSES_ATTR_REVERSE);
+    renderer_deactivateAttr(CURSES_ATTR_REVERSE);
 }

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "../util/cursesutil.h"
+#include "../renderer/renderer.h"
 #include "../util/stringutil.h"
 #include "../util/fileutil.h"
 #include "../prompt/prompt.h"
@@ -72,7 +72,7 @@ struct Editor *editor_createBlankEditor() {
 /* Renders the editor */
 void editor_render(struct Editor *editor) {
     int ln = 0;
-    for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next, ln++) {
+    for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < renderer_getScreenHeight() - 1; line = line->next, ln++) {
         if (editor->scrollX < line->len) {
         	int pos = 0;
             for (char *x = line->str + editor->scrollX; *x != '\0'; x++) {
@@ -81,11 +81,11 @@ void editor_render(struct Editor *editor) {
                     
                     // for now, let tabs be rendered as single characters to make cursor positioning easier
                     case '\t':
-                        curses_drawChar(ln, pos++, ' ');
+                        renderer_drawChar(ln, pos++, ' ');
                         break;
 
                     default:
-                        curses_drawChar(ln, pos++, *x);
+                        renderer_drawChar(ln, pos++, *x);
                         break;
 
                 }
@@ -106,7 +106,7 @@ void editor_moveCursorUp(struct Editor *editor) {
 
 /* Use this function in place of just editor->cursY++ to handle horizontal scroll updates */
 void editor_moveCursorDown(struct Editor *editor) {
-    if (editor->cursY == editor->scrollY + curses_getScreenHeight() - 2) {
+    if (editor->cursY == editor->scrollY + renderer_getScreenHeight() - 2) {
         editor->scrollY++;
         editor->scrollLine = editor->scrollLine->next;
     }
@@ -118,9 +118,9 @@ void editor_run(struct Editor *editor) {
     if (editor->shouldRender) editor_render(editor);
     editor->shouldRender = 0;
 
-    curses_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
+    renderer_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
     
-    int ch = curses_getch();
+    int ch = renderer_getch();
     
     if (ch != CURSES_CH_ERR) editor->shouldRender = 1;
 
@@ -156,7 +156,7 @@ void editor_run(struct Editor *editor) {
                 editor->cursX = oldPrevLen;                                                             // Set the horizontal cursor pos correctly
                 
                 // Update scroll
-                if (editor->cursX - editor->scrollX > curses_getScreenWidth()) editor->scrollX = editor->cursX - curses_getScreenWidth() + 2;
+                if (editor->cursX - editor->scrollX > renderer_getScreenWidth()) editor->scrollX = editor->cursX - renderer_getScreenWidth() + 2;
 
                 editor->lineCount--;
 
@@ -178,7 +178,7 @@ void editor_run(struct Editor *editor) {
                 editor->line = editor->line->prev;	
                 editor->cursX = editor->line->len;
                 
-                if (editor->cursX - editor->scrollX > curses_getScreenWidth()) editor->scrollX = editor->cursX - curses_getScreenWidth() + 2;
+                if (editor->cursX - editor->scrollX > renderer_getScreenWidth()) editor->scrollX = editor->cursX - renderer_getScreenWidth() + 2;
 	        }
                 
             break;
@@ -187,7 +187,7 @@ void editor_run(struct Editor *editor) {
 
             if (editor->cursX < editor->line->len) {
                 
-                if (editor->cursX - editor->scrollX + 1 == curses_getScreenWidth()) editor->scrollX++;
+                if (editor->cursX - editor->scrollX + 1 == renderer_getScreenWidth()) editor->scrollX++;
                 
                 editor->cursX++;
             } else if (editor->cursX == editor->line->len && editor->line->next != NULL) {
@@ -265,7 +265,7 @@ void editor_run(struct Editor *editor) {
             editor_appendToLine(editor->line, "    ", editor->cursX);
             editor->cursX += 4;
 
-            if (editor->cursX - editor->scrollX >= curses_getScreenWidth()) editor->scrollX += 4;
+            if (editor->cursX - editor->scrollX >= renderer_getScreenWidth()) editor->scrollX += 4;
             break;
 
         case CURSES_CHAR_CTRL('s'): {
@@ -302,7 +302,7 @@ void editor_run(struct Editor *editor) {
             editor_appendToLine(editor->line, chrStr, editor->cursX);
 
             // Scroll on typing into scroll end
-            if (editor->line->len - editor->scrollX >= curses_getScreenWidth()) editor->scrollX++;
+            if (editor->line->len - editor->scrollX >= renderer_getScreenWidth()) editor->scrollX++;
             
             editor->cursX++;
             
@@ -313,7 +313,7 @@ void editor_run(struct Editor *editor) {
         }
     }
 
-    if (editor->shouldRender) curses_clear();
+    if (editor->shouldRender) renderer_clear();
 }
 
 void editor_freeEditor(struct Editor *editor) {
