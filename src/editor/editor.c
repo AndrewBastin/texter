@@ -10,7 +10,6 @@
 #include "editor.h"
 
 
-/* Creates an editor instance for a given filename and load its contents, returns null if errors occur*/
 struct Editor *editor_createEditorFromFile(char *filename) {
 
     struct Editor *editor = editor_createBlankEditor();
@@ -51,7 +50,6 @@ struct Editor *editor_createEditorFromFile(char *filename) {
     return editor;
 }
 
-/* Creates a new instance of an editor*/
 struct Editor *editor_createBlankEditor() {
 
     struct Editor *editor = (struct Editor*) malloc(sizeof(struct Editor));
@@ -71,6 +69,7 @@ struct Editor *editor_createBlankEditor() {
     return editor;
 }
 
+/* Renders the editor */
 void editor_render(struct Editor *editor) {
     int ln = 0;
     for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < curses_getScreenHeight() - 1; line = line->next, ln++) {
@@ -114,7 +113,6 @@ void editor_moveCursorDown(struct Editor *editor) {
     editor->cursY++;
 }
 
-/* Runs the given editor instance */
 void editor_run(struct Editor *editor) {
 
     if (editor->shouldRender) editor_render(editor);
@@ -318,7 +316,6 @@ void editor_run(struct Editor *editor) {
     if (editor->shouldRender) curses_clear();
 }
 
-/* Deallocates the given editor instance */
 void editor_freeEditor(struct Editor *editor) {
 
     for (struct EditorLine *line = editor->firstLine; line != NULL;) {

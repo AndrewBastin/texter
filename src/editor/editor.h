@@ -36,9 +36,17 @@ struct Editor {
     int lineCount;
 };
 
+
+/* Creates an editor instance for a given filename and load its contents, returns null if errors occur*/
 struct Editor *editor_createEditorFromFile(char *filename);
+
+/* Creates a new instance of an editor*/
 struct Editor *editor_createBlankEditor();
+
+/* Runs the given editor instance */
 void editor_run(struct Editor *editor);
+
+/* Deallocates the given editor instance */
 void editor_freeEditor(struct Editor *editor);
 
 #endif
