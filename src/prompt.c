@@ -1,10 +1,10 @@
 #include <string.h>
 #include <termbox.h>
 
-#include "../renderer/renderer.h"
-#include "../util/stringutil.h"
-#include "../editor/editor.h"
-#include "../editor/line.h"
+#include "renderer.h"
+#include "stringutil.h"
+#include "editor.h"
+#include "line.h"
 
 #define PROMPT_SAVENAME 1
 

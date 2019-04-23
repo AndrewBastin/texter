@@ -1,4 +1,4 @@
-#include "../editor/editor.h"
+#include "editor.h"
 
 #define PROMPT_SAVENAME 1
 

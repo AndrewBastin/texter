@@ -1,6 +1,6 @@
-#include "../editor/editor.h"
-#include "../editor/line.h"
-#include "../renderer/renderer.h"
+#include "editor.h"
+#include "line.h"
+#include "renderer.h"
 
 void status_run(struct Editor *editor) {
     

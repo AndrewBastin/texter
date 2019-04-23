@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <termbox.h>
 
-#include "../renderer/renderer.h"
-#include "../util/stringutil.h"
-#include "../util/fileutil.h"
-#include "../prompt/prompt.h"
+#include "renderer.h"
+#include "stringutil.h"
+#include "fileutil.h"
+#include "prompt.h"
 #include "line.h"
 #include "editor.h"
 

@@ -3,9 +3,9 @@
 #include <signal.h>
 #include <termbox.h>
 
-#include "renderer/renderer.h"
-#include "editor/editor.h"
-#include "status/status.h"
+#include "renderer.h"
+#include "editor.h"
+#include "status.h"
 
 
 struct Editor *editor = NULL;
@@ -44,15 +44,15 @@ int main(int argc, char *argv[]) {
 	}
 
 	renderer_init();
-    
+
     struct tb_event *ev = malloc(sizeof(struct tb_event));
 
 	while (1) {
 
 		status_run(editor);
-		
+
 		editor_render(editor);
-        
+
         tb_peek_event(ev, 10);
 	}
 
