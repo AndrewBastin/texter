@@ -1,3 +1,5 @@
+#include <termbox.h>
+
 #ifndef EDITOR_H
 
 #define EDITOR_H
@@ -32,10 +34,21 @@ struct Editor {
     /* The line on the top on the current scroll config */
     struct EditorLine *scrollLine; 
     
+    /* Whether the editor is prompting or not */
+    short isPrompting;
+    /* What is the current prompt type (if open, else maybe garbage value) */
+    int promptType;
+    /* Stores char data for prompts to store state */
+    char *promptLine;
+    /* Prompt horizontal cursor position */
+    int promptCursX;
+
     /* Number of lines the current editor instance holds */
     int lineCount;
 };
 
+/* Reads the event and updates the editor accordingly */
+void editor_input(struct Editor *editor, struct tb_event *e);
 
 /* Creates an editor instance for a given filename and load its contents, returns null if errors occur*/
 struct Editor *editor_createEditorFromFile(char *filename);
@@ -43,8 +56,8 @@ struct Editor *editor_createEditorFromFile(char *filename);
 /* Creates a new instance of an editor*/
 struct Editor *editor_createBlankEditor();
 
-/* Runs the given editor instance */
-void editor_run(struct Editor *editor);
+/* Renders the editor */
+void editor_render(struct Editor *editor);
 
 /* Deallocates the given editor instance */
 void editor_freeEditor(struct Editor *editor);

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
+#include <termbox.h>
 
 #include "renderer/renderer.h"
 #include "editor/editor.h"
@@ -43,13 +44,16 @@ int main(int argc, char *argv[]) {
 	}
 
 	renderer_init();
+    
+    struct tb_event *ev = malloc(sizeof(struct tb_event));
 
 	while (1) {
 
 		status_run(editor);
 		
-		editor_run(editor);
-
+		editor_render(editor);
+        
+        tb_peek_event(ev, 10);
 	}
 
 	return 0;

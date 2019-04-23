@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <termbox.h>
 
 #include "../renderer/renderer.h"
 #include "../util/stringutil.h"
@@ -72,6 +73,8 @@ struct Editor *editor_createBlankEditor() {
 /* Renders the editor */
 void editor_render(struct Editor *editor) {
     int ln = 0;
+    if (editor->shouldRender == 0) return;
+
     for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < renderer_getScreenHeight() - 1; line = line->next, ln++) {
         if (editor->scrollX < line->len) {
         	int pos = 0;
@@ -93,6 +96,12 @@ void editor_render(struct Editor *editor) {
             }
 	    }
     }
+
+    if (editor->isPrompting) {
+        // TODO : Implement this 
+    }
+
+    editor->shouldRender = 0;
 }
 
 /* Use this function in place of just editor->cursY-- to handle horizontal scroll updates */
@@ -113,23 +122,13 @@ void editor_moveCursorDown(struct Editor *editor) {
     editor->cursY++;
 }
 
-void editor_run(struct Editor *editor) {
+void editor_input(struct Editor *editor, struct tb_event *e) {
+    editor->shouldRender = 1;
 
-    if (editor->shouldRender) editor_render(editor);
-    editor->shouldRender = 0;
+    switch (e->key) {
+        
+        case TB_KEY_BACKSPACE:
 
-    renderer_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
-    
-    int ch = renderer_getch();
-    
-    if (ch != CURSES_CH_ERR) editor->shouldRender = 1;
-
-    switch (ch) {
-        case CURSES_CH_ERR:
-            break;
-
-        case CURSES_KEY_BACKSPACE:
-            
             if (editor->cursX > 0) {                                                                    // There is text on the left to delete
                 editor_deleteFromLine(editor->line, editor->cursX - 1, editor->cursX - 1);
                 editor->cursX--;
@@ -164,9 +163,9 @@ void editor_run(struct Editor *editor) {
             }
 
             break;
-
-        case CURSES_KEY_LEFT:
-
+        
+        case TB_KEY_ARROW_LEFT:
+            
             if (editor->cursX > 0) {
                 
                 if (editor->cursX == editor->scrollX) editor->scrollX--;
@@ -183,7 +182,7 @@ void editor_run(struct Editor *editor) {
                 
             break;
 
-        case CURSES_KEY_RIGHT:
+        case TB_KEY_ARROW_RIGHT:
 
             if (editor->cursX < editor->line->len) {
                 
@@ -201,7 +200,7 @@ void editor_run(struct Editor *editor) {
 
             break;
 
-        case CURSES_KEY_UP:
+        case TB_KEY_ARROW_UP:
             
             if (editor->cursY > 0) {
 
@@ -213,11 +212,11 @@ void editor_run(struct Editor *editor) {
                 
                 editor_moveCursorUp(editor);
             }
-
+            
             break;
 
-        case CURSES_KEY_DOWN:
-            
+        case TB_KEY_ARROW_DOWN:
+
             if (editor->line->next != NULL) {
 
                 if (editor->cursX > editor->line->next->len) { // Clamp cursor x pos to the end of the next line
@@ -228,11 +227,11 @@ void editor_run(struct Editor *editor) {
                 
                 editor_moveCursorDown(editor);
             }
-
+            
             break;
 
-        case '\n': {
-            
+        case TB_KEY_ENTER: {
+
             char *newLineContent = substring(editor->line->str, editor->cursX, editor->line->len);
             char *currLineContent = substring(editor->line->str, 0, editor->cursX);
 
@@ -261,20 +260,19 @@ void editor_run(struct Editor *editor) {
             break;
         }
 
-        case '\t':
+        case TB_KEY_TAB:
             editor_appendToLine(editor->line, "    ", editor->cursX);
             editor->cursX += 4;
 
             if (editor->cursX - editor->scrollX >= renderer_getScreenWidth()) editor->scrollX += 4;
             break;
-
-        case CURSES_CHAR_CTRL('s'): {
-            
+        
+        case TB_KEY_CTRL_S: {
             FILE *file;
             if (editor->filename != NULL) {
                 file = fopen(editor->filename, "w+");
             } else {
-                prompt_run(PROMPT_SAVENAME, editor);           // Prompt for a filename and set the editor to target that
+                // TODO : Implement proper run
                 file = fopen(editor->filename, "w+");
             }
 
@@ -295,25 +293,24 @@ void editor_run(struct Editor *editor) {
                 editor->isModified = 0;
             }
             break;
-        }
-            
-        default: {
-            char *chrStr = charAsString(ch);
-            editor_appendToLine(editor->line, chrStr, editor->cursX);
 
-            // Scroll on typing into scroll end
-            if (editor->line->len - editor->scrollX >= renderer_getScreenWidth()) editor->scrollX++;
-            
-            editor->cursX++;
-            
-            free(chrStr);
+            default: { 
+                char *chrStr = charAsString(e->ch);
+                editor_appendToLine(editor->line, chrStr, editor->cursX);
 
-            editor->isModified = 1;
-            break;
+                // Scroll on typing into scroll end
+                if (editor->line->len - editor->scrollX >= renderer_getScreenWidth()) editor->scrollX++;
+                
+                editor->cursX++;
+                
+                free(chrStr);
+
+                editor->isModified = 1;
+                break;
+            }
         }
     }
 
-    if (editor->shouldRender) renderer_clear();
 }
 
 void editor_freeEditor(struct Editor *editor) {
