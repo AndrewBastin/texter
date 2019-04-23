@@ -1,0 +1,4 @@
+[submodule "libs/termbox"]
+	path = libs/termbox
+	url = https://github.com/nsf/termbox
+	branch = master
