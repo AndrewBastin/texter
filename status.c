@@ -20,7 +20,7 @@ void status_run(struct Editor *editor) {
     size_t leftReqSize = snprintf(
         NULL,
         0,
-        " %s %s [%d lines] %s",
+        " %s %s [%d lines] %s ",
         (editor->filename == NULL) ? "" : editor->filename,
         (editor->doesFileExist) ? "" : "<New File>",
         editor->lineCount,
