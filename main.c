@@ -10,20 +10,7 @@
 
 struct Editor *editor = NULL;
 
-
-void signalHandler(int sig) {
-	if (sig == SIGINT) {
-		renderer_deinit();
-
-		if (editor != NULL) editor_freeEditor(editor);
-		exit(0);
-	}
-}
-
-
 int main(int argc, char *argv[]) {
-
-	signal(SIGINT, signalHandler);						// Set Signal Handler
 
 	if (argc > 2) {
 		printf("ERROR : Too many arguments supplied \n\n");
@@ -53,8 +40,17 @@ int main(int argc, char *argv[]) {
 
 		editor_render(editor);
 
-        tb_peek_event(ev, 10);
-	}
+        tb_present();
+
+        tb_poll_event(ev);
+	    
+        if (ev->key == TB_KEY_CTRL_C) break;
+    }
+    
+    free(ev);
+    renderer_deinit();
+    editor_freeEditor(editor);
+
 
 	return 0;
 }
