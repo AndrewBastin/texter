@@ -97,6 +97,8 @@ void editor_render(struct Editor *editor) {
 	    }
     }
 
+    renderer_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
+
     if (editor->isPrompting) {
         // TODO : Implement this 
     }
