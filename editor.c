@@ -127,6 +127,9 @@ void editor_moveCursorDown(struct Editor *editor) {
 void editor_input_backsapce(struct Editor *editor) { 
     if (editor->cursX > 0) {                                                                    // There is text on the left to delete
         editor_deleteFromLine(editor->line, editor->cursX - 1, editor->cursX - 1);
+        
+        if (editor->cursX == editor->scrollX + 1 && editor->scrollX > 0) editor->scrollX--;
+
         editor->cursX--;
         editor->isModified = 1;
     } else if (editor->cursX == 0 && editor->line->prev != NULL) {                              // There is no text on the left to delete, move line contents to the line above and destroy this line
