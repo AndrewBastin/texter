@@ -124,46 +124,52 @@ void editor_moveCursorDown(struct Editor *editor) {
     editor->cursY++;
 }
 
+void editor_input_backsapce(struct Editor *editor) { 
+    if (editor->cursX > 0) {                                                                    // There is text on the left to delete
+        editor_deleteFromLine(editor->line, editor->cursX - 1, editor->cursX - 1);
+        editor->cursX--;
+        editor->isModified = 1;
+    } else if (editor->cursX == 0 && editor->line->prev != NULL) {                              // There is no text on the left to delete, move line contents to the line above and destroy this line
+        
+        int oldPrevLen = editor->line->prev->len;                                               // Stored to move the cursor to correct place later
+
+        editor_appendToLine(editor->line->prev, editor->line->str, editor->line->prev->len);    // Concat line contents
+
+        if (editor->line->next != NULL) {                                                       // If there is a line below, set its previous line to the line above
+            editor->line->next->prev = editor->line->prev;
+        }
+
+        editor->line->prev->next = editor->line->next;                                          // Set the line before's next to the line below this line
+
+        struct EditorLine *l = editor->line;                                                    // Temp pointer to store the value for deletion
+
+        editor->line = editor->line->prev;
+
+        editor_freeLine(l);                                                                     // Delete the line
+        
+        editor_moveCursorUp(editor);
+        editor->cursX = oldPrevLen;                                                             // Set the horizontal cursor pos correctly
+        
+        // Update scroll
+        if (editor->cursX - editor->scrollX > renderer_getScreenWidth()) editor->scrollX = editor->cursX - renderer_getScreenWidth() + 2;
+
+        editor->lineCount--;
+
+        editor->isModified = 1;
+    }
+}
+
 void editor_input(struct Editor *editor, struct tb_event *e) {
     editor->shouldRender = 1;
 
     switch (e->key) {
         
+        case TB_KEY_BACKSPACE2:
+            editor_input_backsapce(editor);
+            break;
+
         case TB_KEY_BACKSPACE:
-
-            if (editor->cursX > 0) {                                                                    // There is text on the left to delete
-                editor_deleteFromLine(editor->line, editor->cursX - 1, editor->cursX - 1);
-                editor->cursX--;
-                editor->isModified = 1;
-            } else if (editor->cursX == 0 && editor->line->prev != NULL) {                              // There is no text on the left to delete, move line contents to the line above and destroy this line
-                
-                int oldPrevLen = editor->line->prev->len;                                               // Stored to move the cursor to correct place later
-
-                editor_appendToLine(editor->line->prev, editor->line->str, editor->line->prev->len);    // Concat line contents
-
-                if (editor->line->next != NULL) {                                                       // If there is a line below, set its previous line to the line above
-                    editor->line->next->prev = editor->line->prev;
-                }
-
-                editor->line->prev->next = editor->line->next;                                          // Set the line before's next to the line below this line
-
-                struct EditorLine *l = editor->line;                                                    // Temp pointer to store the value for deletion
-
-                editor->line = editor->line->prev;
-
-                editor_freeLine(l);                                                                     // Delete the line
-                
-                editor_moveCursorUp(editor);
-                editor->cursX = oldPrevLen;                                                             // Set the horizontal cursor pos correctly
-                
-                // Update scroll
-                if (editor->cursX - editor->scrollX > renderer_getScreenWidth()) editor->scrollX = editor->cursX - renderer_getScreenWidth() + 2;
-
-                editor->lineCount--;
-
-                editor->isModified = 1;
-            }
-
+            editor_input_backsapce(editor);
             break;
         
         case TB_KEY_ARROW_LEFT:
@@ -297,7 +303,11 @@ void editor_input(struct Editor *editor, struct tb_event *e) {
             break;
 
             default: { 
-                char *chrStr = charAsString(e->ch);
+                char *chrStr;
+                
+                if (e->key == TB_KEY_SPACE) chrStr = charAsString(' ');
+                else chrStr = charAsString(e->ch);
+                
                 editor_appendToLine(editor->line, chrStr, editor->cursX);
 
                 // Scroll on typing into scroll end

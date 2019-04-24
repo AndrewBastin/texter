@@ -35,6 +35,8 @@ int main(int argc, char *argv[]) {
     struct tb_event *ev = malloc(sizeof(struct tb_event));
 
 	while (1) {
+        
+        renderer_clear();
 
 		status_run(editor);
 
@@ -45,6 +47,8 @@ int main(int argc, char *argv[]) {
         tb_poll_event(ev);
 	    
         if (ev->key == TB_KEY_CTRL_C) break;
+        
+        editor_input(editor, ev);
     }
     
     free(ev);
