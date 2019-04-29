@@ -164,6 +164,9 @@ void editor_input_backsapce(struct Editor *editor) {
 
 void editor_input(struct Editor *editor, struct tb_event *e) {
     editor->shouldRender = 1;
+    
+    // Block certain unimplemented keys
+    if (e->key == TB_KEY_ESC) return;
 
     switch (e->key) {
         
