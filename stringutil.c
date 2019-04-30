@@ -19,3 +19,35 @@ char *substring(char *str, int startIndex, int endIndex) {
 
     return s;
 }
+
+/* Returns a new string removed from a string */
+char *deleteAtIndex(char *str, int startIndex, int endIndex) {
+   size_t len = strlen(str);
+
+   char *resp = malloc(((len - ((endIndex - startIndex) + 1)) + 1) * sizeof(char));
+
+   for (int i = 0, k = 0; i <= len; i++) {
+       if (!(i >= startIndex && i <= endIndex)) {
+           resp[k++] = str[i];
+       }
+   }
+
+   return resp;
+}
+
+/* Create a new string with the 2 strings concatenated at a certain index */
+char *appendAtIndex(char *str, char *toConcat, int appendIndex) {
+
+    size_t concLen = strlen(toConcat);
+    size_t oldLen = strlen(str);
+
+    char *result = malloc((oldLen + concLen + 1) * sizeof(char));
+
+    memcpy(result, str, appendIndex * sizeof(char));
+    memcpy(result + appendIndex, toConcat, concLen * sizeof(char));
+    memcpy(result + appendIndex + concLen, str + appendIndex, (oldLen - appendIndex) * sizeof(char));
+
+    result[oldLen + concLen] = '\0';
+
+    return result;
+}
