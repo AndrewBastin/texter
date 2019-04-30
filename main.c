@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
         
         renderer_clear();
 
-		status_run(editor);
+		status_render(editor);
 
 		editor_render(editor);
 

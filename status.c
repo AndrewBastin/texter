@@ -11,7 +11,7 @@ void status_fill() {
     }
 }
 
-void status_run(struct Editor *editor) {
+void status_render(struct Editor *editor) {
     
     if (!editor->shouldRender) return;
     
