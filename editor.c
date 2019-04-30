@@ -11,12 +11,28 @@
 #include "editor.h"
 
 
+void editor_closePrompt(struct Editor *editor) {
+    editor->isPrompting = 0;
+    editor->promptType = -1;
+    free(editor->promptLine);
+    editor->promptLine = NULL;
+    editor->promptCursX = 0;
+}
+
+void editor_startPrompt(struct Editor *editor, int editorType) {
+    editor->isPrompting = 1;
+    editor->promptType = editorType;
+    editor->promptLine = malloc(sizeof(char));
+    strcpy(editor->promptLine, "");
+    editor->promptCursX = 0;
+}
+
 struct Editor *editor_createEditorFromFile(char *filename) {
 
     struct Editor *editor = editor_createBlankEditor();
     editor->filename = filename;
     editor->doesFileExist = file_exists(filename);
-    
+
     if (editor->doesFileExist) {
             
         // Load file
@@ -66,8 +82,30 @@ struct Editor *editor_createBlankEditor() {
     editor->firstLine = editor->line;
     editor->scrollLine = editor->firstLine;
     editor->lineCount = 1;
+    editor_closePrompt(editor);
 
     return editor;
+}
+
+void editor_savefile(struct Editor *editor) { 
+    FILE *file = fopen(editor->filename, "w+");
+
+    if (file != NULL) {
+            
+        short first = 1;
+        for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
+            
+            // To put new line before all lines other than the first line
+            if (first) first = 0;
+            else fputc('\n', file);
+            
+            fputs(line->str, file);
+        }
+
+        fclose(file);
+
+        editor->isModified = 0;
+    }
 }
 
 /* Renders the editor */
@@ -77,7 +115,7 @@ void editor_render(struct Editor *editor) {
 
     for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < renderer_getScreenHeight() - 1; line = line->next, ln++) {
         if (editor->scrollX < line->len) {
-        	int pos = 0;
+            int pos = 0;
             for (char *x = line->str + editor->scrollX; *x != '\0'; x++) {
                 
                 switch (*x) {
@@ -94,13 +132,13 @@ void editor_render(struct Editor *editor) {
                 }
 
             }
-	    }
+        }
     }
 
     renderer_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
 
     if (editor->isPrompting) {
-        // TODO : Implement this 
+        prompt_render(editor); 
     }
 
     editor->shouldRender = 0;
@@ -124,10 +162,10 @@ void editor_moveCursorDown(struct Editor *editor) {
     editor->cursY++;
 }
 
-void editor_input_backsapce(struct Editor *editor) { 
+void editor_input_backsapce(struct Editor *editor) {
     if (editor->cursX > 0) {                                                                    // There is text on the left to delete
         editor_deleteFromLine(editor->line, editor->cursX - 1, editor->cursX - 1);
-        
+
         if (editor->cursX == editor->scrollX + 1 && editor->scrollX > 0) editor->scrollX--;
 
         editor->cursX--;
@@ -164,7 +202,13 @@ void editor_input_backsapce(struct Editor *editor) {
 
 void editor_input(struct Editor *editor, struct tb_event *e) {
     editor->shouldRender = 1;
-    
+
+    // If prompting, pipe input
+    if (editor->isPrompting) {
+        prompt_input(editor, e);
+        return;
+    }
+
     // Block certain unimplemented keys
     if (e->key == TB_KEY_ESC) return;
 
@@ -192,14 +236,14 @@ void editor_input(struct Editor *editor, struct tb_event *e) {
                 editor->cursX = editor->line->len;
                 
                 if (editor->cursX - editor->scrollX > renderer_getScreenWidth()) editor->scrollX = editor->cursX - renderer_getScreenWidth() + 2;
-	        }
+            }
                 
             break;
 
         case TB_KEY_ARROW_RIGHT:
 
             if (editor->cursX < editor->line->len) {
-                
+
                 if (editor->cursX - editor->scrollX + 1 == renderer_getScreenWidth()) editor->scrollX++;
                 
                 editor->cursX++;
@@ -282,51 +326,38 @@ void editor_input(struct Editor *editor, struct tb_event *e) {
             break;
         
         case TB_KEY_CTRL_S: {
-            FILE *file;
-            if (editor->filename != NULL) {
-                file = fopen(editor->filename, "w+");
-            } else {
-                // TODO : Implement proper run
-                file = fopen(editor->filename, "w+");
+            if (editor->filename == NULL) {
+                editor_startPrompt(editor, PROMPT_SAVENAME);
+                return;
             }
+            
+            // Don't do anything if prompting something
+            if (editor->isPrompting) return;
+            
+            editor_savefile(editor);
 
-            if (file != NULL) {
-                    
-                short first = 1;
-                for (struct EditorLine *line = editor->firstLine; line != NULL; line = line->next) {
-                    
-                    // To put new line before all lines other than the first line
-                    if (first) first = 0;
-                    else fputc('\n', file);
-                    
-                    fputs(line->str, file);
-                }
-
-                fclose(file);
-
-                editor->isModified = 0;
-            }
             break;
-
-            default: { 
-                char *chrStr;
-                
-                if (e->key == TB_KEY_SPACE) chrStr = charAsString(' ');
-                else chrStr = charAsString(e->ch);
-                
-                editor_appendToLine(editor->line, chrStr, editor->cursX);
-
-                // Scroll on typing into scroll end
-                if (editor->line->len - editor->scrollX >= renderer_getScreenWidth()) editor->scrollX++;
-                
-                editor->cursX++;
-                
-                free(chrStr);
-
-                editor->isModified = 1;
-                break;
-            }
         }
+
+        default: { 
+            char *chrStr;
+            
+            if (e->key == TB_KEY_SPACE) chrStr = charAsString(' ');
+            else chrStr = charAsString(e->ch);
+            
+            editor_appendToLine(editor->line, chrStr, editor->cursX);
+
+            // Scroll on typing into scroll end
+            if (editor->line->len - editor->scrollX >= renderer_getScreenWidth()) editor->scrollX++;
+            
+            editor->cursX++;
+            
+            free(chrStr);
+
+            editor->isModified = 1;
+            break;
+        }
+
     }
 
 }

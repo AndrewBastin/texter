@@ -56,6 +56,12 @@ struct Editor *editor_createEditorFromFile(char *filename);
 /* Creates a new instance of an editor*/
 struct Editor *editor_createBlankEditor();
 
+/* Closes an open prompt session */
+void editor_closePrompt(struct Editor *editor);
+
+/* Saves the file in the editor */
+void editor_savefile(struct Editor *editor);
+
 /* Renders the editor */
 void editor_render(struct Editor *editor);
 
