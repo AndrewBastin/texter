@@ -38,10 +38,13 @@ void prompt_input_backspace(struct Editor *editor) {
 /* Sets the filename of the editor to the specific file */
 void prompt_save_input(struct Editor *editor, struct tb_event *ev) {
     
-    if (ev->key == TB_KEY_ESC) return;
-
     switch (ev->key) {
         
+        case TB_KEY_ESC:
+            editor_closePrompt(editor);
+            break;
+
+
         case TB_KEY_ENTER:
             editor->filename = editor->promptLine;
             editor_savefile(editor);
