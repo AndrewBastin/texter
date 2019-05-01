@@ -4,3 +4,4 @@ obj/
 .ccls-cache/
 *.o
 compile_commands.json
+tags
