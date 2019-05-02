@@ -34,7 +34,9 @@ struct Editor *editor_createEditorFromFile(char *filename) {
     editor->doesFileExist = file_exists(filename);
 
     if (editor->doesFileExist) {
-            
+        // Check write permissions
+        editor->fileReadonly = (isFileWritable(filename)) ? 0 : 1;
+
         // Load file
         FILE *file = fopen(filename, "r");
         if (file == NULL) { // Error Handling
@@ -74,6 +76,7 @@ struct Editor *editor_createBlankEditor() {
     editor->filename = NULL;
     editor->line = editor_createLine("", NULL, NULL);   // Create the first line
     editor->isModified = 0;
+    editor->fileReadonly = 0;
     editor->cursX = 0;
     editor->cursY = 0;
     editor->scrollX = 0;
@@ -326,16 +329,20 @@ void editor_input(struct Editor *editor, struct tb_event *e) {
             break;
         
         case TB_KEY_CTRL_S: {
-            if (editor->filename == NULL) {
-                editor_startPrompt(editor, PROMPT_SAVENAME);
-                return;
-            }
-            
-            // Don't do anything if prompting something
-            if (editor->isPrompting) return;
-            
-            editor_savefile(editor);
+            // Ignore save request if file is loaded readonly
+            if (!editor->fileReadonly) {
+                
+                if (editor->filename == NULL) {
+                    editor_startPrompt(editor, PROMPT_SAVENAME);
+                    return;
+                }
+                
+                // Don't do anything if prompting something
+                if (editor->isPrompting) return;
+                
+                editor_savefile(editor);
 
+            }
             break;
         }
 

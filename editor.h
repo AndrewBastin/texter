@@ -12,7 +12,9 @@ struct Editor {
     short doesFileExist;
     /* 1 if the file is modified 0 if the file is not modified */
     short isModified;
-    
+    /* 1 if the file can't be written to (permissions) */
+    short fileReadonly;
+
     /* The line in the editor being currently edited */
     struct EditorLine *line;
 
