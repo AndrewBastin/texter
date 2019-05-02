@@ -20,8 +20,9 @@ void status_render(struct Editor *editor) {
     size_t leftReqSize = snprintf(
         NULL,
         0,
-        " %s %s [%d lines] %s ",
+        " %s %s %s [%d lines] %s ",
         (editor->filename == NULL) ? "" : editor->filename,
+        (editor->fileReadonly) ? "[RO]" : "",
         (editor->doesFileExist) ? "" : "<New File>",
         editor->lineCount,
         (editor->isModified) ? "[+]" : ""
@@ -32,8 +33,9 @@ void status_render(struct Editor *editor) {
     snprintf(
         leftStr,
         leftReqSize,
-        " %s %s [%d lines] %s ",
+        " %s %s %s [%d lines] %s ",
         (editor->filename == NULL) ? "" : editor->filename,
+        (editor->fileReadonly) ? "[RO]" : "",
         (editor->doesFileExist) ? "" : "<New File>",
         editor->lineCount,
         (editor->isModified) ? "[+]" : ""
