@@ -8,23 +8,14 @@ texter_ldlibs:=-lm $(LDLIBS)
 texter_objects:=$(patsubst %.c,%.o,$(wildcard *.c))
 texter_libs_deps:=
 texter_static_var:=
-
-ifdef texter_static
-	texter_static_var:=-static
-endif
-
-ifdef texter_libs
-	texter_ldlibs:=$(texter_static_libs) $(texter_ldlibs)
-  	texter_cflags:=-Ilibs/termbox/src -Ilibs $(texter_cflags)
-  	texter_libs_deps:=$(texter_static_libs)
-else
-  	texter_ldlibs:=$(texter_dynamic_libs) $(texter_ldlibs)
-endif
+texter_ldlibs:=$(texter_static_libs) $(texter_ldlibs)
+texter_cflags:=-Ilibs/termbox/src -Ilibs $(texter_cflags)
+texter_libs_deps:=$(texter_static_libs)
 
 all: texter
 
 texter: $(texter_libs_deps) $(texter_objects)
-	$(CC) $(texter_static_var) $(texter_cflags) $(texter_objects) $(texter_ldflags) $(texter_ldlibs) -o bin/texter
+	$(CC) $(texter_cflags) $(texter_objects) $(texter_ldflags) $(texter_ldlibs) -o bin/texter
 
 $(texter_objects): %.o: %.c
 	$(CC) -c $(texter_cflags) $< -o $@
