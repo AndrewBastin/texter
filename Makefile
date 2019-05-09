@@ -41,8 +41,11 @@ sloc:
 install: texter
 	install -D -v -m 755 bin/texter $(DESTDIR)$(prefix)/bin/texter
 
+uninstall:
+	rm -r $(DESTDIR)$(prefix)/bin/texter
+
 clean:
 	rm -f texter $(texter_objects) $(texter_libs_deps) 
 	$(MAKE) -C libs clean
 
-.PHONY: all sloc install clean
+.PHONY: all sloc install uninstall clean
