@@ -18,15 +18,12 @@ void prompt_blank() {
     }
 }
 
-void prompt_input_backspace(struct Editor *editor) {
-    if (editor->promptCursX > 0) {
-        char *newStr = deleteAtIndex(editor->promptLine, editor->promptCursX - 1, editor->promptCursX - 1);
-
-        free(editor->promptLine);
-        editor->promptLine = newStr;
-
-        editor->promptCursX--;
-    }
+void prompt_init(struct Editor *editor) {
+  switch (editor->promptType) {
+    case PROMPT_SAVENAME:
+      prompt_save_init(editor);
+      break;
+  }
 }
 
 /* Sets the filename of the editor to the specific file */

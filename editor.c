@@ -12,19 +12,17 @@
 
 
 void editor_closePrompt(struct Editor *editor) {
-    editor->isPrompting = 0;
-    editor->promptType = -1;
-    free(editor->promptLine);
-    editor->promptLine = NULL;
-    editor->promptCursX = 0;
+  if (editor->isPrompting  == 0) return;
+
+  editor->isPrompting = 0;
+  editor->promptType = -1; 
+  free(editor->promptState);
 }
 
 void editor_startPrompt(struct Editor *editor, int editorType) {
-    editor->isPrompting = 1;
-    editor->promptType = editorType;
-    editor->promptLine = malloc(sizeof(char));
-    strcpy(editor->promptLine, "");
-    editor->promptCursX = 0;
+  editor->isPrompting = 1;
+  editor->promptType = editorType;
+  prompt_init(editor);
 }
 
 struct Editor *editor_createEditorFromFile(char *filename) {
@@ -370,13 +368,13 @@ void editor_input(struct Editor *editor, struct tb_event *e) {
 }
 
 void editor_freeEditor(struct Editor *editor) {
+  editor_closePrompt(editor);
+  for (struct EditorLine *line = editor->firstLine; line != NULL;) {
+      struct EditorLine *n = line; // Store a temp pointer to move line pointer safely
 
-    for (struct EditorLine *line = editor->firstLine; line != NULL;) {
-        struct EditorLine *n = line; // Store a temp pointer to move line pointer safely
+      line = line->next;
+      editor_freeLine(n);
+  }
 
-        line = line->next;
-        editor_freeLine(n);
-    }
-
-    free(editor);
+  free(editor);
 }
