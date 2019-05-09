@@ -40,11 +40,10 @@ struct Editor {
     short isPrompting;
     /* What is the current prompt type (if open, else maybe garbage value) */
     int promptType;
-    /* Stores char data for prompts to store state */
-    char *promptLine;
-    /* Prompt horizontal cursor position */
-    int promptCursX;
-
+    
+    /* Stores prompt state (prompt type dependent) */
+    void *promptState;
+    
     /* Number of lines the current editor instance holds */
     int lineCount;
 };
