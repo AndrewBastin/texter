@@ -5,8 +5,8 @@
 short isFileWritable(char *filename) {
     struct stat s;
     short code = stat(filename, &s);
-
-    return (code == 0) && (s.st_mode & W_OK);
+    
+    return (code == 0) && (access(filename, W_OK) == 0); 
 }
 
 short file_exists(char *filename) {
