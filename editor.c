@@ -85,7 +85,6 @@ struct Editor *editor_createBlankEditor() {
   editor->lineCount = 1;
   editor->isPrompting = 0;
   editor->promptType = -1;
-  editor_closePrompt(editor);
   editor->promptState = NULL;
 
   return editor;
