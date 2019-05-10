@@ -56,6 +56,7 @@ void prompt_save_input(struct Editor *editor, struct tb_event *ev) {
         case TB_KEY_ENTER:
             editor->filename = state->filename;
             editor_savefile(editor);
+            editor->doesFileExist = 1;
             editor_closePrompt(editor);
             break;
 
