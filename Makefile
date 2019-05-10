@@ -1,6 +1,6 @@
 prefix?=/usr/local
 
-texter_cflags:=$(CFLAGS)
+texter_cflags:=-g $(CFLAGS)
 texter_ldflags:=$(LDFLAGS)
 texter_dynamic_libs:=-ltermbox
 texter_static_libs:=libs/termbox/src/libtermbox.a

@@ -7,8 +7,10 @@
 #include "line.h"
 
 #include "prompt_save.h"
+#include "prompt_open.h"
 
 #define PROMPT_SAVENAME 1
+#define PROMPT_OPEN 2
 
 /* Blanks the prompt bar */
 void prompt_blank() {
@@ -23,26 +25,35 @@ void prompt_init(struct Editor *editor) {
     case PROMPT_SAVENAME:
       prompt_save_init(editor);
       break;
+    case PROMPT_OPEN:
+      prompt_open_init(editor);
+      break;
   }
 }
 
 /* Sets the filename of the editor to the specific file */
 void prompt_render(struct Editor *editor) {
-    prompt_blank();
+  prompt_blank();
 
-    switch (editor->promptType) {
-        case PROMPT_SAVENAME:
-            prompt_save_render(editor);
-            break;
-    }
+  switch (editor->promptType) {
+    case PROMPT_SAVENAME:
+      prompt_save_render(editor);
+      break;
+    case PROMPT_OPEN:
+      prompt_open_render(editor);
+      break;
+  }
 }
 
 void prompt_input(struct Editor *editor, struct tb_event *ev) {
-    
-    switch (editor->promptType) {
-        case PROMPT_SAVENAME:
-            prompt_save_input(editor, ev);
-            break;
-    }
-    
+  
+  switch (editor->promptType) {
+    case PROMPT_SAVENAME:
+      prompt_save_input(editor, ev);
+      break;
+    case PROMPT_OPEN:
+      prompt_open_input(editor, ev);
+      break;
+  }
+  
 }

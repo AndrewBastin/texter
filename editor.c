@@ -19,9 +19,9 @@ void editor_closePrompt(struct Editor *editor) {
   free(editor->promptState);
 }
 
-void editor_startPrompt(struct Editor *editor, int editorType) {
+void editor_startPrompt(struct Editor *editor, int promptType) {
   editor->isPrompting = 1;
-  editor->promptType = editorType;
+  editor->promptType = promptType;
   prompt_init(editor);
 }
 
@@ -69,23 +69,26 @@ struct Editor *editor_createEditorFromFile(char *filename) {
 
 struct Editor *editor_createBlankEditor() {
 
-    struct Editor *editor = (struct Editor*) malloc(sizeof(struct Editor));
+  struct Editor *editor = (struct Editor*) malloc(sizeof(struct Editor));
 
-    editor->filename = NULL;
-    editor->line = editor_createLine("", NULL, NULL);   // Create the first line
-    editor->isModified = 0;
-    editor->fileReadonly = 0;
-    editor->cursX = 0;
-    editor->cursY = 0;
-    editor->scrollX = 0;
-    editor->scrollY = 0;
-    editor->shouldRender = 1;
-    editor->firstLine = editor->line;
-    editor->scrollLine = editor->firstLine;
-    editor->lineCount = 1;
-    editor_closePrompt(editor);
+  editor->filename = NULL;
+  editor->line = editor_createLine("", NULL, NULL);   // Create the first line
+  editor->isModified = 0;
+  editor->fileReadonly = 0;
+  editor->cursX = 0;
+  editor->cursY = 0;
+  editor->scrollX = 0;
+  editor->scrollY = 0;
+  editor->shouldRender = 1;
+  editor->firstLine = editor->line;
+  editor->scrollLine = editor->firstLine;
+  editor->lineCount = 1;
+  editor->isPrompting = 0;
+  editor->promptType = -1;
+  editor_closePrompt(editor);
+  editor->promptState = NULL;
 
-    return editor;
+  return editor;
 }
 
 void editor_savefile(struct Editor *editor) { 
@@ -344,6 +347,11 @@ void editor_input(struct Editor *editor, struct tb_event *e) {
             break;
         }
 
+        case TB_KEY_CTRL_O: {
+          editor_startPrompt(editor, PROMPT_OPEN);
+          break;
+        }
+
         default: { 
             char *chrStr;
             
@@ -375,6 +383,6 @@ void editor_freeEditor(struct Editor *editor) {
       line = line->next;
       editor_freeLine(n);
   }
-
+  
   free(editor);
 }
