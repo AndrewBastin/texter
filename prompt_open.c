@@ -50,8 +50,8 @@ void prompt_open_input(struct Editor *editor, struct tb_event *ev) {
     switch (ev->key) {
         
         case TB_KEY_ESC:
-            editor_closePrompt(editor);
-            break;
+          editor_closePrompt(editor);
+          break;
 
 
         case TB_KEY_ENTER: {
@@ -60,7 +60,6 @@ void prompt_open_input(struct Editor *editor, struct tb_event *ev) {
           editor_freeEditor(editor);
           
           editor = editor_createEditorFromFile(filename);
-          free(filename);
           break;
         }
 

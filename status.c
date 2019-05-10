@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "string.h"
 #include "editor.h"
 #include "line.h"
 #include "renderer.h"
@@ -16,7 +17,7 @@ void status_render(struct Editor *editor) {
   if (!editor->shouldRender) return;
   
   status_fill();
-
+  
   size_t leftReqSize = snprintf(
     NULL,
     0,
@@ -42,7 +43,7 @@ void status_render(struct Editor *editor) {
   );
 
   renderer_drawTextWithColor(renderer_getScreenHeight() - 1, 0, leftStr, leftReqSize, RENDER_COLOR_BLACK, RENDER_COLOR_WHITE);
-  
+
   free(leftStr);
 
 
