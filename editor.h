@@ -66,6 +66,9 @@ void editor_savefile(struct Editor *editor);
 /* Renders the editor */
 void editor_render(struct Editor *editor);
 
+/* Copies the editor state from the source to destination */
+void editor_copyState(struct Editor *dest, struct Editor *src);
+
 /* Deallocates the given editor instance */
 void editor_freeEditor(struct Editor *editor);
 

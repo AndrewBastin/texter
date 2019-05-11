@@ -55,11 +55,12 @@ void prompt_open_input(struct Editor *editor, struct tb_event *ev) {
 
 
         case TB_KEY_ENTER: {
-          char *filename = malloc(sizeof(state->filename));
-          strcpy(filename, state->filename);
-          editor_freeEditor(editor);
           
-          editor = editor_createEditorFromFile(filename);
+          struct Editor *newEditor = editor_createEditorFromFile(state->filename);
+          editor_copyState(editor, newEditor);
+
+          free(newEditor);
+          
           break;
         }
 

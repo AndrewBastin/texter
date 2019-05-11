@@ -113,38 +113,38 @@ void editor_savefile(struct Editor *editor) {
 
 /* Renders the editor */
 void editor_render(struct Editor *editor) {
-    int ln = 0;
-    if (editor->shouldRender == 0) return;
+  int ln = 0;
+  if (editor->shouldRender == 0) return;
 
-    for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < renderer_getScreenHeight() - 1; line = line->next, ln++) {
-        if (editor->scrollX < line->len) {
-            int pos = 0;
-            for (char *x = line->str + editor->scrollX; *x != '\0'; x++) {
-                
-                switch (*x) {
-                    
-                    // for now, let tabs be rendered as single characters to make cursor positioning easier
-                    case '\t':
-                        renderer_drawChar(ln, pos++, ' ');
-                        break;
+  for (struct EditorLine *line = editor->scrollLine; line != NULL && ln < renderer_getScreenHeight() - 1; line = line->next, ln++) {
+    if (editor->scrollX < line->len) {
+      int pos = 0;
+      for (char *x = line->str + editor->scrollX; *x != '\0'; x++) {
+        
+        switch (*x) {
+          
+          // for now, let tabs be rendered as single characters to make cursor positioning easier
+          case '\t':
+            renderer_drawChar(ln, pos++, ' ');
+            break;
 
-                    default:
-                        renderer_drawChar(ln, pos++, *x);
-                        break;
+          default:
+            renderer_drawChar(ln, pos++, *x);
+            break;
 
-                }
-
-            }
         }
+
+      }
     }
+  }
 
-    renderer_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
+  renderer_setCursorPos(editor->cursY - editor->scrollY, editor->cursX - editor->scrollX);
 
-    if (editor->isPrompting) {
-        prompt_render(editor); 
-    }
+  if (editor->isPrompting) {
+      prompt_render(editor); 
+  }
 
-    editor->shouldRender = 0;
+  editor->shouldRender = 0;
 }
 
 /* Use this function in place of just editor->cursY-- to handle horizontal scroll updates */
@@ -372,6 +372,19 @@ void editor_input(struct Editor *editor, struct tb_event *e) {
 
     }
 
+}
+
+void editor_copyState(struct Editor *dest, struct Editor *src) {
+  editor_closePrompt(dest);
+
+  // Delete the line list in the destination list
+  for (struct EditorLine *line = dest->firstLine; line != NULL;) {
+    struct EditorLine *n = line;
+    line = line->next;
+    editor_freeLine(n);
+  }
+
+  memcpy(dest, src, sizeof(struct Editor));
 }
 
 void editor_freeEditor(struct Editor *editor) {
